@@ -1,23 +1,9 @@
 import zmq
 import logging
+import socket
+import json
 
 from config import init
-
-
-def sync(connect_to):
-    # use connect socket + 1
-    sync_with = ':'.join(
-        connect_to.split(':')[:-1] + [str(int(connect_to.split(':')[-1]) + 1)]
-    )
-
-    logging.debug(f'additional socket to start communication: {sync_with}')
-
-    ctx = zmq.Context.instance()
-    s = ctx.socket(zmq.REQ)
-    s.connect(sync_with)
-    s.send(b'READY')
-    s.recv()
-
 
 def main():
 
@@ -30,19 +16,38 @@ def main():
     logging.debug(f'trying to bind zmq to {bind_to}')
 
     ctx = zmq.Context()
-    s = ctx.socket(zmq.SUB)
-    s.bind(bind_to)
-    s.setsockopt(zmq.SUBSCRIBE, b'')
+    zmq_socket = ctx.socket(zmq.SUB)
 
+    try:
+        zmq_socket.bind(bind_to)
+    except Exception as e:
+        logging.fatal('failed to bind to zeromq socket')
+        sys.exit(-1)
+
+    zmq_socket.setsockopt(zmq.SUBSCRIBE, b'')
     logging.debug(f'successfully bound to zeroMQ socket as subscriber')
 
-    #sync(bind_to)
+    # open socket
+    try:
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    except:
+        logging.warning('failed to open udp socket, streaming not available')
+        udp_socket = None
 
     logging.debug(f'entering endless loop')
 
     while True:
-        a = s.recv_pyobj()
-        print(f'received {a}')
+
+        recv = zmq_socket.recv_pyobj()
+
+        if config['print']: 
+            print(f'{recv}')
+        
+        if config['udp_stream'] and udp_socket:
+            udp_socket.sendto(
+                json.dumps(recv).encode(), 
+                (config['udp_address'], config['udp_port'])
+            )
 
 if __name__ == '__main__':
     main()

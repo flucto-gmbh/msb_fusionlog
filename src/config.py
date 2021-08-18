@@ -3,6 +3,7 @@ import json
 import sys
 import signal
 import logging
+import socket
 
 from datetime import datetime
 from os import path
@@ -50,6 +51,13 @@ def parse_arguments() -> dict:
         '--verbose',
         action='store_true',
         help='for debugging purposes'
+    )
+
+    arg_parser.add_argument(
+        '--print',
+        action='store_true',
+        help='prints the incoming data',
+        default=False
     )
 
     arg_parser.add_argument(
