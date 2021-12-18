@@ -2,6 +2,7 @@ import zmq
 import logging
 import socket
 import json
+import sys
 
 from config import init
 
@@ -12,20 +13,32 @@ def main():
     logging.debug('msb_fusionlog.py starting up')
 
     bind_to = f'{config["ipc_protocol"]}:///tmp/msb:{config["ipc_port"]}'
+    bind_to_sender = f'{config["ipc_protocol"]}:///tmp/msb_fusion:{config["ipc_port"]}'
 
     logging.debug(f'trying to bind zmq to {bind_to}')
 
     ctx = zmq.Context()
     zmq_socket = ctx.socket(zmq.SUB)
+    zmq_socket_sender = ctx.socket(zmq.PUB)
 
     try:
         zmq_socket.bind(bind_to)
     except Exception as e:
-        logging.fatal('failed to bind to zeromq socket')
+        logging.fatal(f'failed to bind to zeromq socket: {e}')
+        sys.exit(-1)
+    
+    zmq_socket.setsockopt(zmq.SUBSCRIBE, b'')
+    
+    logging.debug('successfully bound to zeroMQ receiver socket as subscriber')
+
+    logging.debug(f'trying to bind to {bind_to_sender}')
+    try:
+        zmq_socket_sender.bind(bind_to_sender)
+    except Exception as e:
+        logging.fatal(f'failed to bind to zeromq sender socket: {e}')
         sys.exit(-1)
 
-    zmq_socket.setsockopt(zmq.SUBSCRIBE, b'')
-    logging.debug(f'successfully bound to zeroMQ socket as subscriber')
+    logging.debug(f'successfully bound to zeroMQ sender socket as publisher')
 
     # open socket
     try:
@@ -39,6 +52,8 @@ def main():
     while True:
 
         recv = zmq_socket.recv_pyobj()
+
+        zmq_socket_sender.send_pyobj(recv)
 
         if config['print']: 
             print(f'{recv}')
