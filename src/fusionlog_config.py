@@ -3,7 +3,6 @@ import json
 import sys
 import signal
 import logging
-import socket
 
 from datetime import datetime
 from os import path
@@ -31,7 +30,7 @@ def read_parse_config_file(config : dict) -> dict:
 
     config_file_args = json.load(config_file_handler)
 
-    for key, value in config_file_config.items():
+    for key, value in config_file_args.items():
         if key == 'config_file':
             continue
 
@@ -68,13 +67,6 @@ def parse_arguments() -> dict:
     )
 
     arg_parser.add_argument(
-        '--imu-output-div',
-        help='sensor output data rate. calculated by 1100/(1+output_data_div). default 21 (100 Hz)',
-        default=21,
-        type=int
-    )
-
-    arg_parser.add_argument(
         '--config-file',
         help='configuration file: overwrite all commandline options!',
         default='',
@@ -84,21 +76,13 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--dump-config-file',
         help='dumps the default config values into a file',
-        default='',
-    )
-
-    arg_parser.add_argument(
-        '--udp-stream', 
-        help='flag to enable data streaming via a UDP socket',
-        default=False,
-        action='store_true'
     )
 
     arg_parser.add_argument(
         '--udp-address', 
         help='host to stream sensor data to',
-        default='192.168.4.1',
-        type=str
+        default=None,
+        type=str,
     )
 
     arg_parser.add_argument(
@@ -109,14 +93,7 @@ def parse_arguments() -> dict:
     )
 
     arg_parser.add_argument(
-        '--subscriber-ipc-port',
-        help='IPC port used by zeroMQ',
-        default=5555,
-        type=int
-    )
-
-    arg_parser.add_argument(
-        '--publisher-ipc-port',
+        '--ipc-port',
         help='IPC port used by zeroMQ',
         default=5556,
         type=int
@@ -125,15 +102,8 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--ipc-protocol',
         help='the protocol used for IPC with zeroMQ',
-        default='ipc',
+        default='tcp://127.0.0.1',
         type=str,
-    )
-
-    arg_parser.add_argument(
-        '--profile',
-        help='profile flag',
-        default=False,
-        action='store_true'
     )
 
     return arg_parser.parse_args().__dict__
