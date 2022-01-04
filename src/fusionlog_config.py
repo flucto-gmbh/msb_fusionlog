@@ -63,7 +63,8 @@ def parse_arguments() -> dict:
         '--logfile',
         help='path to logfile',
         type=str,
-        default=f'/tmp/msb_fusionlog_{datetime.now().astimezone().strftime("%Y-%m-%dT%H-%M-%S%z")}.log',
+        # default=f'/tmp/msb_fusionlog_{datetime.now().astimezone().strftime("%Y-%m-%dT%H-%M-%S%z")}.log',
+        default='',
     )
 
     arg_parser.add_argument(
@@ -81,7 +82,7 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--udp-address', 
         help='host to stream sensor data to',
-        default=None,
+        default='127.0.0.1',
         type=str,
     )
 
