@@ -3,6 +3,7 @@ import json
 import sys
 import signal
 import logging
+import os
 
 from datetime import datetime
 from os import path
@@ -65,6 +66,34 @@ def parse_arguments() -> dict:
         type=str,
         # default=f'/tmp/msb_fusionlog_{datetime.now().astimezone().strftime("%Y-%m-%dT%H-%M-%S%z")}.log',
         default='',
+    )
+
+    arg_parser.add_argument(
+        '--base-data-dir',
+        help='directory to consistently store recorded data. Defaults to $HOME/msb_data',
+        default=path.join(os.environ['HOME'], 'msb_data'),
+        type=str,
+    )
+
+    arg_parser.add_argument(
+        '--custom-data-dir',
+        help='directory to consistently store recorded data',
+        default=f'{datetime.utcnow().strftime("%Y-%m-%d")}',
+        type=str,
+    )
+
+    arg_parser.add_argument(
+        '--data-file-size',
+        help='maximum size of data files before roll over im MB. Default is 500 MB.',
+        default=500,
+        type=int,
+    )
+
+    arg_parser.add_argument(
+        '--max-number-data-files',
+        help='maximum number of data files before roll over. Default is 5.',
+        default=5,
+        type=int,
     )
 
     arg_parser.add_argument(
