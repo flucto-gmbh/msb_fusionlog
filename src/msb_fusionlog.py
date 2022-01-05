@@ -38,6 +38,8 @@ def main():
         logging.warning('failed to open udp socket, streaming not available')
         config['udp_address'] = None
 
+    logging.debug(f'successfully opened udp socket. Sendig to {config["udp_address"]}:{config["udp_port"]}')
+
     logging.debug(f'entering endless loop')
 
     while True:
