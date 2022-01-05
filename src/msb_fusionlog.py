@@ -5,7 +5,7 @@ import json
 import sys
 import pickle
 
-from fusionlog_config import init
+from .fusionlog_config import init
 
 def main():
 
@@ -53,7 +53,7 @@ def main():
         
         if config['udp_address'] and udp_socket:
             udp_socket.sendto(
-                json.dumps({topic : data}).encode(), 
+                json.dumps({topic : data}), 
                 (config['udp_address'], config['udp_port'])
             )
         
