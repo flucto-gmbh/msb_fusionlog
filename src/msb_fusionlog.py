@@ -22,11 +22,11 @@ def main():
 
     config = init()
 
-    logging.debug('msb_fusionlog.py starting up')
+    print('msb_fusionlog.py starting up')
 
     connect_to = f'{config["ipc_protocol"]}:{config["ipc_port"]}'
 
-    logging.debug(f'trying to bind zmq to {connect_to}')
+    print(f'trying to bind zmq to {connect_to}')
 
     ctx = zmq.Context()
     zmq_socket = ctx.socket(zmq.SUB)
@@ -40,7 +40,7 @@ def main():
     # let fusionlog subscribe to all available data
     zmq_socket.setsockopt(zmq.SUBSCRIBE, b'')
     
-    logging.debug('successfully bound to zeroMQ receiver socket as subscriber')
+    print('successfully bound to zeroMQ receiver socket as subscriber')
 
     # create new logger instance
     data_dir = path.join(config['base_data_dir'], config['custom_data_dir'] )
@@ -71,7 +71,7 @@ def main():
     data_file_logger.setLevel("INFO")
     data_file_logger.addHandler(data_file_handler)
 
-    logging.debug(f'saving data to {data_file_path} with a file size of {bytes_per_file} and a maximum number of {n_files}')
+    print(f'saving data to {data_file_path} with a file size of {bytes_per_file} and a maximum number of {n_files}')
 
     # open socket
     try:
@@ -80,9 +80,9 @@ def main():
         logging.warning('failed to open udp socket, streaming not available')
         config['udp_address'] = None
 
-    logging.debug(f'successfully opened udp socket. Sendig to {config["udp_address"]}:{config["udp_port"]}')
+    print(f'successfully opened udp socket. Sendig to {config["udp_address"]}:{config["udp_port"]}')
 
-    logging.debug(f'entering endless loop')
+    print(f'entering endless loop')
 
     while True:
 
@@ -91,7 +91,7 @@ def main():
         try:
             [topic, data] = zmq_socket.recv_multipart()
         except Exception as e:
-            logging.error(f'failed to receive message: {e}')
+            print(f'failed to receive message: {e}')
             continue
 
         topic = topic.decode('utf-8')
@@ -99,7 +99,7 @@ def main():
         try:
             data = pickle.loads(data)
         except Exception as e:
-            logging.error(f'failed to load pickle message, skipping: {e}')
+            print(f'failed to load pickle message, skipping: {e}')
             continue
 
         # log to data file
@@ -115,10 +115,8 @@ def main():
                     (config['udp_address'], config['udp_port'])
                 )
             except Exception as e:
-                logging.error(f'failed to send data to {config["udp_address"]}:{config["udp_port"]}: {e}')
+                print(f'failed to send data to {config["udp_address"]}:{config["udp_port"]}: {e}')
                 continue
         
-        #implement ring buffer logging here
-
 if __name__ == '__main__':
     main()

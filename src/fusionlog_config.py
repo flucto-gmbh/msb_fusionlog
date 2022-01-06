@@ -2,14 +2,13 @@ import argparse
 import json
 import sys
 import signal
-import logging
 import os
 
 from datetime import datetime
 from os import path
 
 def signal_handler_exit(sig, frame):
-    logging.info('* msb_fusionlog: bye')
+    print('* msb_fusionlog: bye')
     sys.exit(0)
 
 def dump_config_file(config : dict):
@@ -144,22 +143,15 @@ def init() -> dict:
 
     config = parse_arguments()
 
-    logging.basicConfig(
-        filename=config['logfile'],
-        level=config['verbose'] if logging.DEBUG else logging.WARNING,
-        format='%(levelname)s: %(asctime)s %(message)s',
-        datefmt='%Y%m%dT%H%M%S%z',
-    )
-
-    logging.debug('msb_fusionlog.py parsing of configuration done')
+    print('msb_fusionlog.py parsing of configuration done')
 
     if config['config_file']:
-        logging.debug('parsing config file')
+        print('parsing config file')
         config = read_parse_config_file(config)
-        logging.debug(f'updated config file: {config}')
+        print(f'updated config file: {config}')
 
     if config['dump_config_file']:
-        logging.debug(f'dumping config file to {config["dump_config_file"]}')
+        print(f'dumping config file to {config["dump_config_file"]}')
         dump_config_file(config)
         
     return config
