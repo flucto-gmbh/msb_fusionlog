@@ -44,7 +44,7 @@ def main():
 
     # create new logger instance
     data_dir = path.join(config['base_data_dir'], config['custom_data_dir'] )
-    data_file_name = f'{socket.gethostname()}_{datetime.utcnow().isoformat()}.log'
+    data_file_name = f'{socket.gethostname()}_{datetime.datetime.utcnow().strftime("%Y-%m-%dT%T")}.log'
     data_file_path = path.join(data_dir, data_file_name)
 
     if not path.exists(data_file_path):
