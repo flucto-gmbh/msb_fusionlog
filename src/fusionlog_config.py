@@ -4,8 +4,8 @@ import sys
 import signal
 import os
 
-from datetime import datetime
 from os import path
+from socket import gethostname
 
 def signal_handler_exit(sig, frame):
     print('* msb_fusionlog: bye')
@@ -77,14 +77,14 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--custom-data-dir',
         help='directory to consistently store recorded data',
-        default=f'{datetime.utcnow().strftime("%Y-%m-%d")}',
+        default=f'{gethostname()}',
         type=str,
     )
 
     arg_parser.add_argument(
-        '--data-file-size',
-        help='maximum size of data files before roll over im MB. Default is 500 MB.',
-        default=500,
+        '--logfile-interval',
+        help='length of each logfile in seconds',
+        default=300,  
         type=int,
     )
 
@@ -105,20 +105,6 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--dump-config-file',
         help='dumps the default config values into a file',
-    )
-
-    arg_parser.add_argument(
-        '--udp-address', 
-        help='host to stream sensor data to',
-        default='127.0.0.1',
-        type=str,
-    )
-
-    arg_parser.add_argument(
-        '--udp-port',
-        help='port to stream darta to',
-        default=9870,
-        type=int
     )
 
     arg_parser.add_argument(
