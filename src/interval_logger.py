@@ -6,7 +6,7 @@ from datetime import (datetime, timezone, timedelta)
 import sys, signal
 from typing import Text
 
-DT_INTERVAL=300 # seconds for each file
+DT_INTERVAL=600 # seconds for each file
 
 def exit_handler(signal, frame):
     print(" byeeeee")
