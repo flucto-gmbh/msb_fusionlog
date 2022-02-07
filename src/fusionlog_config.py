@@ -84,7 +84,7 @@ def parse_arguments() -> dict:
     arg_parser.add_argument(
         '--logfile-interval',
         help='length of each logfile in seconds',
-        default=300,  
+        default=600,  
         type=int,
     )
 
