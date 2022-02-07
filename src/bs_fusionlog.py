@@ -87,16 +87,35 @@ def main():
         # check if a file handle exists for the given id
         if id not in data_files:
 
-            data_files[id]['log_dir'] = path.join(config['base_dir'])
+            print(f'{id} not in data_files, creating...')
 
-            # create log_dir
-            # calculate current interval
-            # create file handle
-            pass
+            # create empty dict
+            data_files[id] = dict()
 
-            # create file handle
+            data_files[id]['log_dir'] = path.join(config['base_data_dir'], id)
+            
+            if not path.exists(data_files[id]['log_dir']):
+                try:
+                    makedirs(data_files[id]['log_dir'], exist_ok=True)
+                except Exception as e:
+                    print(f'failed to create log file dir: {data_files[id]["log_dir"]}: {e}')
+                    sys.exit(-1)
+            
+            data_files[id]['current_interval'] = calc_interval_from_timestamp(
+                data[0],
+                dt_interval=config['logfile_interval']
+            )
+
+            data_files[id]['file_handle'] = get_interval_file_handle(
+                interval = data_files[id]['current_interval'],
+                log_file_prefix = id,
+                log_dir = data_files[id]['log_dir'],
+            )
+
+            print(f'created data_file for {id}: {data_files[id]}')
 
         if data[0] >= data_files[id]['current_interval']:
+
             data_files[id]['current_interval'], data_files[id]['file_handle'] = update_interval_file_handle(
                 current_interval = data_files[id]['current_interval'],
                 current_file_handle = data_files[id]['file_handle'],
@@ -104,13 +123,7 @@ def main():
                 log_dir = data_files[id]['log_dir']
             )
         
-        data_files[id]['file_handle'].write(
-            json.dumps(
-                {
-                    topic : data
-                }
-            )
-        )        
+        data_files[id]['file_handle'].write(f'{json.dumps({topic : data})}\n')        
 
         # id is the motion sensor box id
         # data is a dictionary where the key denotes the type of data and 
