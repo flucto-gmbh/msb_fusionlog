@@ -45,8 +45,8 @@ def get_next_interval(current_interval : int, dt_interval : int = DT_INTERVAL):
 
 def get_interval_file_handle(interval : int, log_file_prefix : str, log_dir : str, verbose=False) -> TextIOWrapper :
     # create human readable datetime
-    interval_iso = datetime.fromtimestamp(interval, timezone.utc).isoformat()
-    filepath = path.join(log_dir, f'{log_file_prefix}_{interval_iso}.log')
+    interval_iso = datetime.fromtimestamp(interval, timezone.utc).isoformat().replace(':', '').replace('-', '')
+    filepath = path.join(log_dir, f'{log_file_prefix.lower()}_{interval_iso}.log')
 
     try:
         file_handle = open(filepath, 'w')
